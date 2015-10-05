@@ -28,7 +28,7 @@ onPageLoadPopulate();
 function onPageLoadPopulate() {
 	$.ajax({
 		type: 'GET',
-		url: "https://outdoor-data-api.herokuapp.com/api.json?api_key=1fc0ab0d006bccd6e0fdf1856cea5b2c&q[city_cont]=Denver&q[activities_activity_type_name_cont]=hiking&radius=100",
+		url: "https://outdoor-data-api.herokuapp.com/api.json?api_key=1fc0ab0d006bccd6e0fdf1856cea5b2c&q[city_cont]=Denver&q[activities_activity_type_name_cont]=mountain biking&radius=100",
 		dataType: 'jsonp',
 		jsonp: 'callback',
 		jsonpCallback: 'query',
