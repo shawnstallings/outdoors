@@ -1,11 +1,17 @@
 $(function() {
 
+var mapOriginalState = $('#map').clone();
+
 onPageLoadPopulate();
 
 	$('#search').on('click', function(event) {
 		event.preventDefault();
-		$('.site').empty();
+		
+		$('.site').empty(); //clear previous results
+		$('.no-results').css('display', 'none'); //make sure error message is hidden
+		$('#map').replaceWith(mapOriginalState.clone()); //set map div to empty and fix class
 
+		//pull requested search
 		var activity = $('#activity option:selected').val();
 		var city = $('#city').val();
 	
@@ -18,13 +24,14 @@ onPageLoadPopulate();
 				
 		})
 			.done(function(data) {
-				populateResults(data);
+				populateResults(data); //populate results
 			});
 	});
 });
 
 /* Functions */
 
+//load page with example search
 function onPageLoadPopulate() {
 	$.ajax({
 		type: 'GET',
@@ -43,7 +50,8 @@ function onPageLoadPopulate() {
 function populateResults(data) {
 
 	if (data.places.length === 0) {
-			alert("There are no results for your search.");
+			$('.no-results').css('display', 'block');
+			$('body').animate({ scrollTop: 0}, "slow");
 		}
 	else {
 		//Grab map for initial site
@@ -60,17 +68,15 @@ function populateResults(data) {
 
 			var city = data.places[i].city;
 			var state = data.places[i].state;				
-
+			// define marker location for map
 			var sitelat = data.places[i].lat;
 			var sitelon = data.places[i].lon;
 			var sitename = data.places[i].name;
 
 				L.marker([sitelat, sitelon]).addTo(map)
     					.bindPopup(sitename)
-
+    		// drill down to get inside places and find activities
 			if (data.places[i].activities.length > 0) {
-
-				var $table = $('<table/>');
 
 				for (var x = 0; x < data.places[i].activities.length; x++) {
 						
@@ -83,14 +89,14 @@ function populateResults(data) {
 						var desc = result.description; 
 													
 						if (photo !== null) {
-							var image = '<img src="' + photo + "\" class=\"photo\" alt=\"location image\" />";
+							var image = '<a href="' + url + '"><img src="' + photo + '" class="photo" alt="location image" /></a>';
 						}
 						else {
 							var image = '<img src="images/noimage.png" class="photo" alt="location image">';
 						}	  
-
-						$table.append( '<tr class="row"><tr class="row"><td>' + image + '</td></tr><tr class="row"><td class="cell"><div class="desc"><b><a href="' + url + '">' + name + '</b></a><span> (click name for more details)</span> ' + city + ', ' + state + '<br><br>' + desc + '</div></td></tr>' );
-						$('.site').append($table);
+						// load results into the html div
+						$('#site').append('<div class="site-block"><div>' + image + '</div><div class="desc"><b><a href="' + url + '">' + name + '</b></a><br>(click name for more details)<br>' + city + ', ' + state + '<br><br>' + desc + '</div></div>');
+						// find any broken images
 						$('img').error(function(){
         					$(this).attr('src', 'images/noimage.png');
 						})
